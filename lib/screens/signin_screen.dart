@@ -13,8 +13,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,10 +62,30 @@ class _SignInScreenState extends State<SignInScreen> {
                 signUpOption()
               ],
             ),
+            
           ),
         ),
       ),
     );
+  }
+  // yeh check karega ki user signed in hai ya nhi ...agar haa toh phir direct login ho jayega
+  
+  @override
+  void initState() {
+    super.initState();
+    checkUserLoggedIn();
+  }
+
+  void checkUserLoggedIn() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+      
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
+    });
   }
 
   Row signUpOption() {

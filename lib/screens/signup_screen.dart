@@ -14,9 +14,9 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _userNameTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _userNameTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,22 +60,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                firebaseUIButton(context, "Sign Up", () {
-                  FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                          email: _emailTextController.text,
-                          password: _passwordTextController.text)
-                      .then((value) {
-                    print("Created New Account");
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()));
-                  }).onError((error, stackTrace) {
-                    print("Error ${error.toString()}");
-                  });
-                })
-              ],
-            ),
-          ))),
+                firebaseUIButton(context, "Sign Up", () async {
+              try {
+              final userCredential = await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(
+              email: _emailTextController.text,
+              password: _passwordTextController.text);
+                print("Created New Account");
+               Navigator.push(context,
+               MaterialPageRoute(builder: (context) => HomeScreen()));
+              } catch (error) {
+              String message = "";
+                switch (error.toString()) {
+                case "weak-password":
+                  message = "The password provided is too weak.";
+                break;
+                case "email-already-in-use":
+                message = "The email address is already in use by another account.";
+                break;
+                case "invalid-email":
+                message = "The email address is invalid.";
+                break;
+                default:
+                message = "An error occurred. Please try again.";
+              }
+            ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+            content: Text(message),
+      ),
     );
+  }
+}),
+],
+),
+ ))),
+);
   }
 }
